@@ -1,0 +1,262 @@
+from sys import exit
+import pandas as pd   # Eisagwgi open source vivliothikis gia tin epeksergasia twn dedomenwn tou dataset
+import matplotlib.pyplot as plt   # Eisagwgi vivliothikis gia tin dimiourgia diagrammatwn
+import scipy.cluster.hierarchy as schc   #Eisagwgi vivliothikis gia tin ylopoihsh tou dendrogrammatos
+import numpy as np   #Eisagwgi vivliothikis gia tin sunartisi taksinomisis pinakwn
+import seaborn as sns  # Eisagwgi vivliothikis gia tin optikopoihsh twn dedwmenwn
+df_customer = pd.read_csv('G:\Downloads\Dataset 3.csv')   # Diavazoume kai apothikeuoume to dataframe me tin methodo tou pandas read_csv
+
+def menu(): #menu poy o xrhsths epilegei ton algorithmo poy thelei na treksei
+    # metavlites gia to perasma sthlwn tou dataset ston algorithmo
+    age = 2
+    income = 3
+    spendings = 4
+    # titloi gia to perasma twn onomasiwn stoys grafous
+    ai = "Annual Income"
+    ag = "Age"
+    sp = "Spendings"
+    k = True
+    while k: #me thn while ayth epitrepoyme ston xrhsth na mporei na xrhsimopoihsh oses fores toys algorithmoys
+        print("Για τον KMeans πληκτρολογήστε το 1, \n") #menou me odigies
+        print("Για τον Hierarchical πληκτρολογήστε το 2, \n")
+        print("Για τον DBSCAN πληκτρολογήστε το 3, \n")
+        print("Για να τερματίσει το πρόγραμμα πληκτρολογήστε το 0.")
+
+        e = input("Παρακαλώ επιλέξτε τι θέλετε να κάνετε:\n") #epilegoume ton algorithmo poy tha treksoume
+        if e == "1": #mpainoyme sthn diadikasia toy alogithmoy KMeans
+            a=True
+            while a:#me thn while ayth bebaionoume oti o xrhsths tha epileksei swsta mia leitourgia apo to menu
+                menu_print() #print menu me odigies
+                tk = input("Παρακαλώ επιλέξτε τι θέλετε να κάνετε:\n")
+                if tk == "1": #trexei to senario eisodima-eksoda
+                    X = df_customer.iloc[:, [income, spendings]].values   # Epilegoume tis stiles tou etoisiou eisodimatos kai tis vathmologias dapanwn
+                    kmeans_clustering(X, ai, sp)# vazoyme swstoys titlous sto grafima twn clusters
+                    a=False #epistrefei sto arxiko menoy
+                elif tk == "2":#trexei to senario ilikia-eksoda
+                    X = df_customer.iloc[:, [age, spendings]].values    # Epilegoume tis stiles tis ilikias kai tis vathmologias dapanwn
+                    kmeans_clustering(X, ag, sp) # vazoyme swstoys titlous sto grafima twn clusters
+                    a=False #epistrefei sto arxiko menoy
+                elif tk == "3":  #trexei to senario eisodima-ilikia
+                    X = df_customer.iloc[:, [income, age]].values    # Epilegoume tis stiles tou etoisiou eisodimatos kai tis ilikias
+                    kmeans_clustering(X, ai, ag)#  vazoyme swstoys titlous sto grafima twn clusters
+                    a=False #epistrefei sto arxiko menoy
+                elif tk == "0": #epistrefei sto arxiko menoy xwris na ektelesei kapoion algorithmo
+                    a=False
+                else: #epivevaionoyme oti o xrhsths epelekse swsta apo to menou
+                    print("Παρακαλώ επιλέξτε σύμφωνα με τις οδηγίες\n")
+                    a=True
+
+        elif e == "2": #mpainoyme sthn diadikasia toy alogithmoy Hierarchical
+            b=True
+            while b:#me thn while ayth bebaionoume oti o xrhsths tha epileksei swsta mia leitourgia apo to menu
+                menu_print() #print menu me odigies
+                th = input("Παρακαλώ επιλέξτε τι θέλετε να κάνετε:\n")
+
+                if th == "1":#trexei to senario eisodima-eksoda
+                    
+                    X = df_customer.iloc[:, [income, spendings]].values   # Epilegoume tis stiles tou etoisiou eisodimatos kai tis vathmologias dapanwn
+                    hierarchical_clustering(X, ai, sp)
+                    b=False
+                elif th == "2": #trexei to senario ilikia-eksoda
+                    X = df_customer.iloc[:, [age, spendings]].values   # Epilegoume tis stiles tis ilikias kai tis vathmologias dapanwn
+                    hierarchical_clustering(X, ag, sp)
+                    b=False
+                elif th == "3":     #trexei to senario eisodima-ilikia
+                    X = df_customer.iloc[:, [income, age]].values   # Epilegoume tis stiles tou etoisiou eisodimatos kai tis ilikias
+                    hierarchical_clustering(X, ai, ag)
+                    b=False
+                elif th == "0": #epistrefei sto arxiko menoy xwris na ektelesei kapoion algorithmo
+                    b=False
+                else:   #epivevaionoyme oti o xrhsths epelekse swsta apo to menou
+                    print("Παρακαλώ επιλέξτε σύμφωνα με τις οδηγίες\n")
+                    b=True
+
+        elif e == "3": #mpainoyme sthn diadikasia toy alogithmoy DBSCAN
+            c=True
+            while c:
+                menu_print()
+                td = input("Παρακαλώ επιλέξτε τι θέλετε να κάνετε:\n")
+                if td == "1": #trexei to senario eisodima-eksoda
+                    
+                    X = df_customer.iloc[:, [income, spendings]].values   # Epilegoume tis stiles tou etoisiou eisodimatos kai tis vathmologias dapanwn
+                    dbscan_clustering(X, ai, sp)
+                    c=False
+                elif td == "2": #trexei to senario ilikia-eksoda
+                    X = df_customer.iloc[:, [age, spendings]].values   # Epilegoume tis stiles tis ilikias kai tis vathmologias dapanwn
+                    dbscan_clustering(X, ag, sp)
+                    c=False
+                elif td == "3":
+                    X = df_customer.iloc[:, [income, age]].values   # Epilegoume tis stiles tou etoisiou eisodimatos kai tis ilikias
+                    dbscan_clustering(X, ai, ag)
+                    c=False
+                elif td == "0": #epistrefei sto arxiko menoy xwris na ektelesei kapoion algorithmo
+                    c=False
+                else:   #epivevaionoyme oti o xrhsths epelekse swsta apo to menou
+                    print("Παρακαλώ επιλέξτε σύμφωνα με τις οδηγίες\n")
+                    c=True
+
+
+        elif e == "0": #stamatai thn leitoyrgeia toy programmatos
+            exit(0)
+        else: #epivevaionoyme oti o xrhsths epelekse swsta apo to menou
+            print("Παρακαλώ επιλέξτε σύμφωνα με τις οδηγίες\n")
+            k = True
+
+
+def kmeans_clustering(X, x, y):
+    df_customer.info()   #Ektupwnoume xrisimes plirofories gia to dataframe
+    print(X)  # ektupwnoume autes tis stiles
+    # Elbow Method gia na vroume ton idaniko arithmo omadwn
+    from sklearn.cluster import KMeans
+    wcss = []       #Keni lista gia to athroisma twn tetragwnwn 
+    #ekpaideuoume to modelo gia diaforetikes times omadwn
+    for i in range(1, 11):  # Psaxnoume metaksi 1-10 arithmwn omadwn
+        kmeans = KMeans(n_clusters=i, init='k-means++', random_state=42)    #Kmeans gia omades 1-10 kai init gia tin arxikopoihsh twn kentroidwn
+        kmeans.fit(X)   #Ylopoiei kmeans clustering gia to X
+        wcss.append(kmeans.inertia_)    #Apothikeuoume tis times intertia(sum of squared distances) gia kathe modelo
+
+    # epilogi style plegmatos gia to diagramma
+    sns.set(style="whitegrid")
+    
+    #Dimiourgia grafimmatos gia to elbow method
+    plt.plot(range(1, 11), wcss)
+    plt.title('Graph')
+    plt.xlabel('Number of Clusters')
+    plt.ylabel('wcss')
+    plt.show()
+    
+    n = int(input('Ιδανικός αριθμός ομάδων σύμφωνα με την μέθοδο του αγκώνα:\n'))
+    # Idanikos arithmos omadwn n
+    kmeans = KMeans(n_clusters=n, init='k-means++', random_state=0) #Kmeans clustering gia n omades
+    Y = kmeans.fit_predict(X) #Ekpaideuoume to modelo sto dataset gia arithmo omadwn = 5
+    print(Y)    #Ektupwsi twn omadwn
+
+    #Prosthetoume mia stili sto arxiko dataset me dedomena tis omades pou anikoun oi pelates
+    customer_data = df_customer.copy()
+    customer_data['Clusters'] = kmeans.labels_
+    # print(customer_data)
+    
+    #Taksinomoume tous pelates me vasi tin omada stin opoia anikoun
+    customer_clusters = customer_data.sort_values(by=['Clusters'])
+    customer_clusters['Clusters'].replace(
+        {0: 'Yellow', 1: 'Red', 2: 'Blue', 3: 'Green', 4: 'Purple'})
+    customer_clusters['Clusters'] = customer_clusters['Clusters'].replace(
+        {0: 'Yellow', 1: 'Red', 2: 'Blue', 3: 'Green', 4: 'Purple'})
+    print(customer_clusters)
+
+    # from mpl_toolkits import mplot3d
+
+    # Dimiourgia grafimatos Kmeans clustering 5 omadwn
+    plt.figure(figsize=(8, 8))
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection= '3d')
+    #Topothetoume tin omada 0 stous aksones se megethos 50, xrwma kitrino kai antistoixi etiketa
+    plt.scatter(X[Y == 0, 0], X[Y == 0, 1], s=50,
+                c='yellow', label='Yellow')
+    #Topothetoume tin omada 1 stous aksones se megethos 50, xrwma kokino kai antistoixi etiketa
+    plt.scatter(X[Y == 1, 0], X[Y == 1, 1], s=50,
+                c='red', label='Red')
+    #Topothetoume tin omada 2 stous aksones se megethos 50, xrwma mple kai antistoixi etiketa
+    plt.scatter(X[Y == 2, 0], X[Y == 2, 1], s=50,
+                c='blue', label='Blue')
+    #Topothetoume tin omada 3 stous aksones se megethos 50, xrwma prasino kai antistoixi etiketa
+    plt.scatter(X[Y == 3, 0], X[Y == 3, 1], s=50,
+                c='green', label='Green')
+    #Topothetoume tin omada 4 stous aksones se megethos 50, xrwma violeti kai antistoixi etiketa
+    plt.scatter(X[Y == 4, 0], X[Y == 4, 1], s=50,
+                c='violet', label='Purple')
+    #Topothetoume ta kentra stous aksones se megethos 50, xrwma mauro kai antistoixi etiketa
+    plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[
+                                               :, 1], s=100, c='black', label='Centroids')
+
+    plt.title('Customer Clusters')  #titlos grafimmatos
+    plt.xlabel(x)                   #onoma aksona x
+    plt.ylabel(y)                   #onoma aksona y
+    plt.legend()                    #emfanisi twn etiketwn omadwn
+    plt.show()                      #emfanisi grafimatos
+
+
+def hierarchical_clustering(X, x, y):
+    df_customer.info()      #Ektupwnoume xrisimes plirofories gia to dataframe
+
+    print(X)  # ektupwnoume autes tis stiles
+
+    # Dimiourgia dendrogrammatos gia na vroume tis omades
+    dendrogram = schc.dendrogram(schc.linkage(X, method='ward'))
+    plt.title('DENDROGRAM')
+    plt.xlabel('Customers')
+    plt.ylabel('Eucl_Dist')
+    plt.show()
+    from sklearn.cluster import AgglomerativeClustering   #Eisagwgi vivliothikis gia tin agglomerative hierarchical clustering
+    n = int(input('Ιδανικός αριθμός ομάδων σύμφωνα με το δενδόγραμμα:\n'))
+
+    Z = AgglomerativeClustering(n_clusters=n, affinity='euclidean', linkage='ward')     #Agglomerative clustering gia n omades
+    Y = Z.fit_predict(X)                #Ekpaideuoume to modelo gia to clustering n omadwn
+    print(Y)                            #Ektupwsi twn omadwn
+
+    #Prosthetoume mia stili sto arxiko dataset me dedomena tis omades pou anikoun oi pelates
+    customer_data = df_customer.copy()
+    customer_data['Clusters'] = Z.labels_
+    # print(customer_data)
+    
+    #Taksinomoume tous pelates me vasi tin omada stin opoia anikoun
+    customer_clusters = customer_data.sort_values(by=['Clusters'])
+    customer_clusters['Clusters'].replace(
+        {0: 'Yellow', 1: 'Red', 2: 'Blue', 3: 'Green', 4: 'Purple'})
+    customer_clusters['Clusters'] = customer_clusters['Clusters'].replace(
+        {0: 'Yellow', 1: 'Red', 2: 'Blue', 3: 'Green', 4: 'Purple'})
+    print(customer_clusters)
+
+    #Dimiourgia grafimmatos clustering 5 omadwn
+    plt.figure(figsize=(8, 8))
+    plt.scatter(X[Y == 0, 0], X[Y == 0, 1], s=50, c='yellow', label='Cluster 1')    #Topothetoume tin omada 0 stous aksones se megethos 50, xrwma kitrino kai antistoixi etiketa
+    plt.scatter(X[Y == 1, 0], X[Y == 1, 1], s=50, c='red', label='Cluster 2')       #Topothetoume tin omada 1 stous aksones se megethos 50, xrwma kokino kai antistoixi etiketa
+    plt.scatter(X[Y == 2, 0], X[Y == 2, 1], s=50, c='blue', label='Cluster 3')      #Topothetoume tin omada 2 stous aksones se megethos 50, xrwma mple kai antistoixi etiketa
+    plt.scatter(X[Y == 3, 0], X[Y == 3, 1], s=50, c='green', label='Cluster 4')     #Topothetoume tin omada 3 stous aksones se megethos 50, xrwma prasino kai antistoixi etiketa
+    plt.scatter(X[Y == 4, 0], X[Y == 4, 1], s=50, c='violet', label='Cluster 5')    #Topothetoume tin omada 4 stous aksones se megethos 50, xrwma violeti kai antistoixi etiketa
+
+    plt.title('Customer Clusters')  #titlos grafimmatos
+    plt.xlabel(x)                   #onoma aksona x
+    plt.ylabel(y)                   #onoma aksona y
+    plt.show()                      #emfanisi grafimatos
+
+
+def dbscan_clustering(X, x, y):
+
+    df_customer.info()      #Ektupwnoume xrisimes plirofories gia to dataframe
+    print(X)
+
+    from sklearn.neighbors import NearestNeighbors #Eisagwgi vivliothikis gia tin anazitisi geitonwn kathe stoixeiou
+    N = NearestNeighbors(n_neighbors=5).fit(X)  #Anazitisi kontinoterwn geitonwn tou dataset
+    distances, indices = N.kneighbors(X)        #Apostaseis gia kathe deikti tou ekpaideuomenou dataset
+    distances = np.sort(distances, axis=0)      #Taksinomei ta stoixeia me vasi tis apostaseis
+    distances = distances[:,1]                  #Pairnoume ton taksinomimeno pinaka twn apostasewn
+    plt.plot(distances)                         #Sxediazoume to diagramma
+
+    from sklearn.cluster import DBSCAN          #Eisagwgi vivliothikis gia DBSCAN clustering
+    dbscan = DBSCAN(eps=5, min_samples=5)       #DBSCAN clustering gia eps = 5 kai min_samples = 5
+    Y = dbscan.fit_predict(X)                   #Ekpaideuoume to modelo
+    print(Y)                                    #Ektpwnoume tis omades
+
+    plt.figure(figsize=(8, 8))
+    plt.scatter(X[Y == -1, 0], X[Y == -1, 1], s=50, c='black', label='Noise')       ##Topothetoume ton thoruvo stous aksones se megethos 50, xrwma mauro kai antistoixi etiketa
+    plt.scatter(X[Y == 0, 0], X[Y == 0, 1], s=50, c='yellow', label='Cluster 1')     #Topothetoume tin omada 0 stous aksones se megethos 50, xrwma kitrino kai antistoixi etiketa
+    plt.scatter(X[Y == 1, 0], X[Y == 1, 1], s=50, c='red', label='Cluster 2')       #Topothetoume tin omada 1 stous aksones se megethos 50, xrwma kokino kai antistoixi etiketa
+    plt.scatter(X[Y == 2, 0], X[Y == 2, 1], s=50, c='blue', label='Cluster 3')      #Topothetoume tin omada 2 stous aksones se megethos 50, xrwma mple kai antistoixi etiketa
+    plt.scatter(X[Y == 3, 0], X[Y == 3, 1], s=50, c='green', label='Cluster 4')     #Topothetoume tin omada 3 stous aksones se megethos 50, xrwma prasino kai antistoixi etiketa
+    plt.scatter(X[Y == 4, 0], X[Y == 4, 1], s=50, c='violet', label='Cluster 5')    #Topothetoume tin omada 4 stous aksones se megethos 50, xrwma violeti kai antistoixi etiketa
+
+    plt.title('Customer Clusters')  #titlos grafimmatos
+    plt.xlabel(x)                   #onoma aksona x
+    plt.ylabel(y)                   #onoma aksona y
+    plt.show()                      #emfanisi grafimatos
+
+
+def menu_print():
+    print("Για anual income - spendicg score πληκτρολογήστε το 1, \n")
+    print("Για age - spending score πληκτρολογήστε το 2, \n")
+    print("Για τον age - annual income πληκτρολογήστε το 3, \n")
+    print("Για να πάτε πίσω πληκτρολογήστε το 0.")
+
+
+menu()
